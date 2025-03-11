@@ -1,33 +1,87 @@
-function SideBarHistory({history}) {
-    return(
-        <aside id="default-sidebar" className="border shadow-lg bg-white fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-            <h4 className="text-xl text-start pl-4 pt-4 font-bold">History</h4>
-            <div className="h-full px-3 py-4 overflow-y-auto dark:bg-gray-800">
-                { history.length > 0 && history.map((item, index) => (
-                    <div className="card-hero border shadow-sm rounded-2xl" key={index}>
-                         <img src={item.imageFile} alt="image" className="w-26 h-26 object-cover rounded-t-xl"/>
-                         <div className="class-info p-2 pb-4 mt-2">
-                            <p className="text-xs">Short</p>
-                            <div className="border w-full">
-                                <div className="inline-flex items-center h-5 bg-green-500" style={{ width: `${item.accuracy.short}%` }}>
-                                    <span className="pl-1">{item.accuracy.short}%</span>
+import { useState } from "react";
+
+function SideBarHistory({ history }) {
+    // ใช้ useState ในการจัดการข้อมูลหน้าปัจจุบัน
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 2;  // จำนวนไอเทมที่จะแสดงในแต่ละหน้า
+
+    // คำนวณ index ของไอเทมที่จะแสดงในหน้าแรก
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+    // หั่นข้อมูลเพื่อแสดงแค่จำนวนไอเทมที่ต้องการในแต่ละหน้า
+    const currentItems = history.slice(indexOfFirstItem, indexOfLastItem);
+
+    // ฟังก์ชันสำหรับการเปลี่ยนหน้า
+    const nextPage = () => {
+        if (currentPage < Math.ceil(history.length / itemsPerPage)) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+
+    
+
+    const prevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    return (
+        <div className="mt-4 w-60">
+            <div className="flex flex-col gap-2">
+                {currentItems.map((item, index) => (
+                    <div key={index} className="shadow-xl rounded-xl">
+                        <img
+                            src={item.imageFile}
+                            alt={item.imageFile}
+                            className="w-full rounded-t-xl h-40 object-cover"
+                        />
+                        <div className="px-2 py-2">
+                            <h1 className="text-base overflow-hidden">Name: {item.name}</h1>
+                            <p className="text-xs">แขนสั้น</p>
+                            <div className="border w-full h-5">
+                                <div
+                                    className="bg-green-400 h-full flex items-center"
+                                    style={{ width: `${item.short.toFixed(2)}%` }}
+                                >
+                                    <span className="text-xs pl-[1px]">{item.short.toFixed(2)}%</span>
                                 </div>
                             </div>
-                            <p  className="text-xs">Long</p>
-                            <div className="border w-full">
-                                <div className="inline-flex items-center h-5 bg-green-500" style={{ width: `${item.accuracy.long}%` }}>
-                                    <span className="pl-1">{item.accuracy.long}%</span>
+                            <p className="text-xs">แขนยาว</p>
+                            <div className="border w-full h-5">
+                                <div
+                                    className="bg-green-400 h-full flex items-center"
+                                    style={{ width: `${item.long.toFixed(2)}%` }}
+                                >
+                                    <span className="text-xs pl-[1px]">{item.long.toFixed(2)}%</span>
                                 </div>
                             </div>
-                         </div>
+                        </div>
                     </div>
-                ))
-                }
-                { history.length === 0 && (
-                    <div>No uploads hisroty</div>
-                )}
+                ))}
             </div>
-        </aside>
+
+            {/* ปุ่มสำหรับเปลี่ยนหน้า */}
+            <div className="flex justify-between mt-4">
+                <button
+                    onClick={prevPage}
+                    className="bg-blue-600 px-4 py-2 text-white rounded-md disabled:opacity-50 hover:bg-blue-500"
+                    disabled={currentPage === 1}
+                >
+                    Prev
+                </button>
+                <button
+                    onClick={nextPage}
+                    className="bg-blue-600 px-4 py-2 text-white rounded-md disabled:opacity-50 hover:bg-blue-500"
+                    disabled={currentPage === Math.ceil(history.length / itemsPerPage)}
+                >
+                    Next
+                </button>
+            </div>
+        </div>
     );
-};
+}
+
 export default SideBarHistory;
